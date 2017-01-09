@@ -53,7 +53,7 @@ module PostageCalculator =
         match currency with
             | EUR -> priceInGbp |> withCommission |> eur.fromGbp |> eur.asMoney
             | CHF -> priceInGbp |> withCommission |> chf.fromGbp |> chf.asMoney
-            | _ -> priceInGbp |> gbp.asMoney
+            | GBP -> priceInGbp |> gbp.asMoney
 
     let calculate weight height width depth currency =
         postageInGbp weight height width depth |> convertTo currency
