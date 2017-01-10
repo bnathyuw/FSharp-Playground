@@ -1,5 +1,6 @@
 ﻿namespace FSharpPlayground.Tests
 
+
 module PostageCalculator =
     let private smallPackagePrice = 120.0<gbp>
     let private maximumSmallWeight = 60.0<g>
@@ -13,41 +14,31 @@ module PostageCalculator =
 
     let private withCommission = (+) 200.0<gbp>
 
-    let private (|SmallPackage|_|) (weight, height, width, depth) =
+    type Package = Small | Medium of float<g> | LargeLight of float<l> | LargeHeavy of float<g>
+
+    let (|Small|Medium|LargeLight|LargeHeavy|) (weight:float<g>, height:float<cm>, width:float<cm>, depth:float<cm>) =
+        let volume = height * width * depth / 1000.0
         if weight <= maximumSmallWeight 
-            && height <= maximumSmallHeight 
-            && width <= maximumSmallWidth 
-            && depth <= maximumSmallDepth 
-            then Some ()
-        else None
-
-    let private (|MediumPackage|_|) (weight, height, width, depth) =
-        if weight <= maximumMediumWeight 
-            && height <= maximumMediumHeight 
-            && width <= maximumMediumWidth 
-            && depth <= maximumMediumDepth 
-            then Some weight
-        else None
-
-    let private (|HeavyLargePackage|_|) (weight:float<g>, height:float<cm>, width:float<cm>, depth:float<cm>) =
-        let volume = height * width * depth / 1000.0
-        if float weight > float volume
-            then Some(weight)
-        else None
-
-    let private (|LightLargePackage|_|) (weight:float<g>, height:float<cm>, width:float<cm>, depth:float<cm>) =
-        let volume = height * width * depth / 1000.0
-        if float weight <= float volume
-            then Some(volume)
-        else None
+                && height <= maximumSmallHeight 
+                && width <= maximumSmallWidth 
+                && depth <= maximumSmallDepth 
+            then Small
+        else if weight <= maximumMediumWeight 
+                && height <= maximumMediumHeight 
+                && width <= maximumMediumWidth 
+                && depth <= maximumMediumDepth 
+            then Medium weight
+        else if float weight <= float volume
+            then LargeLight volume
+        else LargeHeavy weight
 
     let private postageInGbp weight height width depth =
         match (weight, height, width, depth) with
-        | SmallPackage _ -> smallPackagePrice 
-        | MediumPackage weight -> weight |> float |> (*) 4.0<gbp>
-        | HeavyLargePackage weight -> weight |> float |> (*) 6.0<gbp>
-        | LightLargePackage volume -> volume |> float |> (*) 6.0<gbp>
-        | _ -> 0.0<gbp>
+            | Small -> smallPackagePrice 
+            | Medium weight -> weight |> float |> (*) 4.0<gbp>
+            | LargeHeavy weight -> weight |> float |> (*) 6.0<gbp>
+            | LargeLight volume -> volume |> float |> (*) 6.0<gbp>
+            | _ -> 0.0<gbp>
 
     let private convertTo currency priceInGbp = 
         match currency with
