@@ -52,7 +52,6 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Money.fs" />
-    <Compile Include="Measures.fs" />
     <Compile Include="CurrencyConverter.fs" />
     <Compile Include="Package.fs" />
     <Compile Include="PackagePricer.fs" />

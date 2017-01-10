@@ -1,6 +1,8 @@
 ﻿namespace FSharpPlayground.Tests
 
+open PackagePricer
+open CurrencyConverter
+
 module PostageCalculator =
     let calculate weight height width depth currency =
-        let package = Package.create weight height width depth
-        PackagePricer.priceOf package |> CurrencyConverter.convertTo currency
+        Package.create weight height width depth |> price |> convertTo currency

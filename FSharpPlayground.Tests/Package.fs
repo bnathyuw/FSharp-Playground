@@ -1,5 +1,9 @@
 ﻿namespace FSharpPlayground.Tests
 
+[<Measure>] type cm
+[<Measure>] type g
+[<Measure>] type ml = cm ^ 3
+
 module Package =
     let private maximumSmallWeight = 60.0<g>
     let private maximumSmallHeight = 229.0<cm>
@@ -10,24 +14,31 @@ module Package =
     let private maximumMediumWidth = 229.0<cm>
     let private maximumMediumDepth = 100.0<cm>
 
-    type T = { Weight:float<g>; Height:float<cm>; Width:float<cm>; Depth:float<cm> }
-    
+    type T = { Weight:float<g>; Height:float<cm>; Width:float<cm>; Depth:float<cm> } with
+         member this.Volume = this.Height * this.Width * this.Depth / 1000.0
+
     let create weight height width depth =
         { Weight = weight; Height = height; Width = width; Depth = depth }
     
-    let isSmall package = 
+    let private isSmall package = 
         package.Weight <= maximumSmallWeight 
             && package.Height <= maximumSmallHeight 
             && package.Width <= maximumSmallWidth 
             && package.Depth <= maximumSmallDepth
 
-    let isMedium package =
+    let private isMedium package =
         package.Weight <= maximumMediumWeight 
             && package.Height <= maximumMediumHeight 
             && package.Width <= maximumMediumWidth 
             && package.Depth <= maximumMediumDepth
 
-    let volume package = package.Height * package.Width * package.Depth / 1000.0
+    let private isLargeLight package =
+        package.Weight / 1.0<g> <= package.Volume / 1.0<ml>
 
-    let isLargeLight package =
-        package.Weight / 1.0<g> <= (package |> volume) / 1.0<cm ^ 3>
+    type Sized = Small | Medium of float<g> | LargeLight of float<ml> | LargeHeavy of float<g>
+
+    let (|Small|Medium|LargeLight|LargeHeavy|) package =
+        if package |> isSmall then Small
+        else if package |> isMedium then Medium package.Weight
+        else if package |> isLargeLight then LargeLight package.Volume
+        else LargeHeavy package.Weight

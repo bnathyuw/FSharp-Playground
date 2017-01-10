@@ -3,8 +3,7 @@
 module CurrencyConverter = 
     let private withCommission = (+) 200.0<gbp>
     
-    let convertTo currency priceInGbp = 
-        match currency with
-            | EUR -> priceInGbp |> withCommission |> eur.fromGbp |> eur.asMoney
-            | CHF -> priceInGbp |> withCommission |> chf.fromGbp |> chf.asMoney
-            | GBP -> priceInGbp |> gbp.asMoney
+    let convertTo = function
+        | EUR -> withCommission >> eur.fromGbp >> eur.asMoney
+        | CHF -> withCommission >> chf.fromGbp >> chf.asMoney
+        | GBP -> gbp.asMoney
