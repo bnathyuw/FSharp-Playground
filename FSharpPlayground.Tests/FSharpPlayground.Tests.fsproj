@@ -53,6 +53,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Money.fs" />
     <Compile Include="Measures.fs" />
+    <Compile Include="CurrencyConverter.fs" />
     <Compile Include="PostageCalculator.fs" />
     <Compile Include="PostageCalculatorShould.fs" />
     <None Include="Script.fsx" />

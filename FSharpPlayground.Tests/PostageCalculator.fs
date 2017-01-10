@@ -1,6 +1,5 @@
 ﻿namespace FSharpPlayground.Tests
 
-
 module PostageCalculator =
     let private smallPackagePrice = 120.0<gbp>
     let private maximumSmallWeight = 60.0<g>
@@ -14,10 +13,10 @@ module PostageCalculator =
 
     let private withCommission = (+) 200.0<gbp>
 
-    type Package = Small | Medium of float<g> | LargeLight of float<l> | LargeHeavy of float<g>
+    type Package = Small | Medium of float<g> | LargeLight of float<cm ^ 3> | LargeHeavy of float<g>
 
-    let (|Small|Medium|LargeLight|LargeHeavy|) (weight:float<g>, height:float<cm>, width:float<cm>, depth:float<cm>) =
-        let volume = height * width * depth / 1000.0
+    let (|Small|Medium|LargeLight|LargeHeavy|) (weight, height, width, depth) =
+        let volume:float<cm ^ 3> = height * width * depth / 1000.0
         if weight <= maximumSmallWeight 
                 && height <= maximumSmallHeight 
                 && width <= maximumSmallWidth 
@@ -28,7 +27,7 @@ module PostageCalculator =
                 && width <= maximumMediumWidth 
                 && depth <= maximumMediumDepth 
             then Medium weight
-        else if float weight <= float volume
+        else if weight / 1.0<g> <= volume / 1.0<cm ^ 3>
             then LargeLight volume
         else LargeHeavy weight
 
@@ -38,13 +37,6 @@ module PostageCalculator =
             | Medium weight -> weight |> float |> (*) 4.0<gbp>
             | LargeHeavy weight -> weight |> float |> (*) 6.0<gbp>
             | LargeLight volume -> volume |> float |> (*) 6.0<gbp>
-            | _ -> 0.0<gbp>
-
-    let private convertTo currency priceInGbp = 
-        match currency with
-            | EUR -> priceInGbp |> withCommission |> eur.fromGbp |> eur.asMoney
-            | CHF -> priceInGbp |> withCommission |> chf.fromGbp |> chf.asMoney
-            | GBP -> priceInGbp |> gbp.asMoney
 
     let calculate weight height width depth currency =
-        postageInGbp weight height width depth |> convertTo currency
+        postageInGbp weight height width depth |> CurrencyConverter.convertTo currency
