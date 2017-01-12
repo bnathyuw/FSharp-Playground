@@ -37,8 +37,9 @@ module Package =
 
     type Sized = Small | Medium of float<g> | LargeLight of float<ml> | LargeHeavy of float<g>
 
-    let (|Small|Medium|LargeLight|LargeHeavy|) package =
-        if package |> isSmall then Small
-        else if package |> isMedium then Medium package.Weight
-        else if package |> isLargeLight then LargeLight package.Volume
-        else LargeHeavy package.Weight
+    let (|Small|Medium|LargeLight|LargeHeavy|) =
+        function
+            | package when isSmall package -> Small
+            | package when isMedium package -> Medium package.Weight
+            | package when isLargeLight package -> LargeLight package.Volume
+            | package -> LargeHeavy package.Weight
